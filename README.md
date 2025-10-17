@@ -14,22 +14,22 @@
 ---
 
 ## Tentang Proyek
-Proyek ini merupakan proyek dari pembelajaran **Data Sains** yang berfokus pada pengelompokan Pola Perilaku dan Resiko Obesitas menggunakan dataset **Obesity or CVD risk (Classify/Regressor/Cluster)**.
 
-### Metodologi Proyek: CRISP-DM
-Proyek ini mengadopsi metodologi standar industri **CRISP-DM (Cross Industry Standard Process for Data Mining)**.
+Proyek ini adalah tugas pada mata kuliah **Data Sains** yang bertujuan mengelompokkan pola perilaku dan menilai risiko obesitas menggunakan dataset **Obesity or CVD risk (Classify/Regressor/Cluster)**.
 
-Untuk penyelesaian **Ujian Tengah Semester (UTS)**, proyek ini ditekankan untuk menyelesaikan dua fase awal:
-1.  **Business Understanding:** Mendefinisikan tujuan proyek dan kebutuhan bisnis.
-2.  **Data Understanding:** Melakukan Analisis Data Eksploratif (EDA) untuk memahami karakteristik, kualitas, dan pola awal data.
+### Metodologi
 
-Fase lanjutan, yaitu **Data Preparation (Preprocessing)**, **Modeling**, **Evaluation**, dan **Deployment**, akan dilanjutkan dan diselesaikan sebagai fokus utama untuk **Ujian Akhir Semester (UAS)**.
+Analisis mengikuti kerangka kerja **CRISP-DM (Cross-Industry Standard Process for Data Mining)**. Dalam rangka Ujian Tengah Semester (UTS), fokus pekerjaan ditempatkan pada dua tahap awal:
+1. **Business Understanding** — merumuskan tujuan proyek dan kebutuhan stakeholder;  
+2. **Data Understanding** — melakukan eksplorasi data untuk memahami struktur, kualitas, dan pola awal dataset.
 
-### Tujuan Analisis Saat Ini (Fase Data Understanding):
+Tahap lanjutan—meliputi **Data Preparation (preprocessing)**, **Modeling**, **Evaluation**, dan **Deployment**—akan dilaksanakan dan diselesaikan pada Ujian Akhir Semester (UAS).
 
-1.  **Memahami Karakteristik** setiap fitur dari data responden (seperti kebiasaan makan, aktivitas, dll).
-2.  **Mengidentifikasi Pola dan Hubungan** antara berbagai fitur (Usia, berat badan berdasarkan Level obesitas atau BMI).
-3.  **Menemukan Wawasan Awal** yang berharga sebagai dasar untuk tahapan *Data Preparation* dan *Modeling* selanjutnya.
+### Tujuan Analisis (Fase Data Understanding)
+
+1. Menelaah karakteristik setiap atribut responden (mis. kebiasaan makan, aktivitas fisik, dll.).  
+2. Mengidentifikasi pola dan hubungan antar-variabel (mis. usia, berat badan, BMI).  
+3. Menghasilkan insight awal yang menjadi dasar perencanaan langkah pembersihan data dan strategi pemodelan pada fase berikutnya.
 
 ---
 ## Cara Menjalankan
@@ -72,7 +72,7 @@ Pastikan Anda telah menginstal lingkungan pengembangan Python yang mencakup:
     Pastikan file **`ObesityDataSet.csv`** berada dalam satu folder yang sama dengan file **`.ipynb`**.
 
 5.  **Mulai Jupyter Notebook:**
-    Buka antarmuka Jupyter Notebook atau JupyterLab di direktori proyek:
+    Buka antarmuka Jupyter Notebook di direktori proyek:
 
     ```bash
     jupyter notebook
