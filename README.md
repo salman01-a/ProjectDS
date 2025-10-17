@@ -3,7 +3,7 @@
 
 ---
 
-## 👥 Anggota Kelompok
+## Anggota Kelompok
 
 | Kelas | NIM | Nama |
 | :---: | :--- | :--- |
@@ -58,7 +58,7 @@ Pastikan Anda telah menginstal lingkungan pengembangan Python yang mencakup:
     Ambil salinan lokal repositori ini menggunakan Git:
 
     ```bash
-    cd ProjectDS_HeartDisease
+    cd ProjectDS
     ```
 
 3.  **Instalasi Library:**
