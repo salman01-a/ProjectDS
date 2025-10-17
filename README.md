@@ -23,7 +23,7 @@ Analisis mengikuti kerangka kerja **CRISP-DM (Cross-Industry Standard Process fo
 1. **Business Understanding** — merumuskan tujuan proyek dan kebutuhan stakeholder;  
 2. **Data Understanding** — melakukan eksplorasi data untuk memahami struktur, kualitas, dan pola awal dataset.
 
-Tahap lanjutan—meliputi **Data Preparation (preprocessing)**, **Modeling**, **Evaluation**, dan **Deployment**—akan dilaksanakan dan diselesaikan pada Ujian Akhir Semester (UAS).
+Tahap lanjutan meliputi **Data Preparation (preprocessing)**, **Modeling**, **Evaluation**, dan **Deployment** akan dilaksanakan dan diselesaikan pada Ujian Akhir Semester (UAS).
 
 ### Tujuan Analisis (Fase Data Understanding)
 
