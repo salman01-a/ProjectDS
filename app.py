@@ -3,98 +3,167 @@ import pandas as pd
 import numpy as np
 import joblib
 
-st.set_page_config(page_title="Obesity Clustering Predictor", page_icon="🥗")
+# Konfigurasi Halaman
+st.set_page_config(page_title="Clustering Tingkat Obesitas", page_icon="🍕", layout="centered")
 
-# 1. Load Models
+# 1. Memuat Model & Scaler
 @st.cache_resource
 def load_models():
-    scaler = joblib.load('scaler.pkl')
-    kmeans = joblib.load('kmeans_model.pkl')
-    gmm = joblib.load('gmm_model.pkl')
-    hira = joblib.load('hira_model.pkl')
-    return scaler, kmeans, gmm, hira
+    try:
+        scaler = joblib.load('scaler.pkl')
+        kmeans = joblib.load('kmeans_model.pkl')
+        gmm = joblib.load('gmm_model.pkl')
+        hira = joblib.load('hira_model.pkl')
+        return scaler, kmeans, gmm, hira
+    except FileNotFoundError:
+        st.error("File model tidak ditemukan. export model terlebih dahulu.")
+        return None, None, None, None
 
 scaler, kmeans, gmm, hira = load_models()
 
-# 2. App Title and Config
-st.title("Obesity Level Clustering System")
-st.write("Enter your lifestyle details below to identify your health cluster.")
+if scaler is not None:
+    # 2. Header
+    st.title("🍕 Clustering Gaya Hidup Obesitas")
+    st.markdown("Prediksi cluster kesehatan Anda berdasarkan kebiasaan gaya hidup.")
 
-# 3. Sidebar - Model Selection
-st.sidebar.header("Configuration")
-model_choice = st.sidebar.selectbox(
-    "Choose Clustering Algorithm:",
-    ("K-Means", "Hierarchical (HIRA)", "Gaussian Mixture (GMM)")
-)
+    # 3. Sidebar - Pemilihan Model
+    st.sidebar.header("Pengaturan")
+    model_choice = st.sidebar.selectbox(
+        "Pilih Algoritma",
+        ("K-Means (3 Cluster)", "Gaussian Mixture (3 Cluster)", "Hierarchical (4 Cluster)")
+    )
 
-# 4. Input Form
-st.subheader("User Lifestyle Data")
-
-col1, col2 = st.columns(2)
-
-with col1:
-    # FAVC: Frequent consumption of high caloric food (Yes=1, No=0)
-    favc_input = st.selectbox("Do you eat high caloric food frequently?", ["No", "Yes"])
-    favc = 1 if favc_input == "Yes" else 0
-
-    # SMOKE: (Yes=1, No=0)
-    smoke_input = st.selectbox("Do you smoke?", ["No", "Yes"])
-    smoke = 1 if smoke_input == "Yes" else 0
-
-    # SCC: Calories consumption monitoring (Yes=1, No=0)
-    scc_input = st.selectbox("Do you monitor your calories?", ["No", "Yes"])
-    scc = 1 if scc_input == "Yes" else 0
-
-    # CAEC: Consumption of food between meals
-    # Mapping assumes LabelEncoder order: Always=0, Frequently=1, Sometimes=2, no=3 
-    # (Check your encoder mappings, but usually alphabetical)
-    # Let's assume ordinal for simplicity: 0=No, 1=Sometimes, 2=Freq, 3=Always
-    caec_map = {"No": 0, "Sometimes": 1, "Frequently": 2, "Always": 3}
-    caec_input = st.selectbox("Consumption of food between meals?", list(caec_map.keys()))
-    caec = caec_map[caec_input]
-
-with col2:
-    # FAF: Physical activity frequency (0 to 3)
-    faf = st.slider("Physical activity frequency (days/week)?", 0.0, 3.0, 1.0, 0.1)
-
-    # FCVC: Frequency of consumption of vegetables (1 to 3)
-    fcvc = st.slider("Vegetable consumption frequency?", 1.0, 3.0, 2.0, 0.1)
-
-    # NCP: Number of main meals (1 to 4)
-    ncp = st.slider("Number of main meals daily?", 1.0, 4.0, 3.0, 0.1)
-
-# 5. Prediction Logic
-if st.button("Predict Cluster"):
-    # Prepare input array
-    # Order must match training: 'FAVC', 'CAEC', 'FAF', 'NCP', 'SMOKE', 'SCC', 'FCVC'
-    input_data = np.array([[favc, caec, faf, ncp, smoke, scc, fcvc]])
+    # 4. Formulir Input
+    st.subheader("Kebiasaan Gaya Hidup Anda")
     
-    # Scale input
-    input_scaled = scaler.transform(input_data)
-    
-    cluster = None
-    
-    if model_choice == "K-Means":
-        cluster = kmeans.predict(input_scaled)[0]
-        st.info(f"Model Used: K-Means (6 Clusters)")
+    col1, col2 = st.columns(2)
+
+    with col1:
+        # FAVC (Label Encoded: No=0, Yes=1)
+        favc_input = st.radio("Apakah Anda sering makan makanan tinggi kalori?", ["Tidak", "Ya"], horizontal=True)
+        favc_val = 1 if favc_input == "Tidak" else 0
+
+        # SMOKE (OneHot: SMOKE_yes: 1/0)
+        smoke_input = st.radio("Apakah Anda merokok?", ["Tidak", "Ya"], horizontal=True)
+        smoke_val = 1 if smoke_input == "Ya" else 0
+
+        # SCC (OneHot: SCC_yes: 1/0)
+        scc_input = st.radio("Apakah Anda memantau asupan kalori Anda?", ["Tidak", "Ya"], horizontal=True)
+        scc_val = 1 if scc_input == "Ya" else 0
+
+        # CAEC (OneHot: Sometimes, no, Frequently)
+        caec_options = ["Kadang-kadang", "Sering", "Selalu", "Tidak"]
+        caec_input_raw = st.selectbox("Seberapa sering Anda nyemil di antara waktu makan utama?", caec_options)
         
-    elif model_choice == "Gaussian Mixture (GMM)":
-        cluster = gmm.predict(input_scaled)[0]
-        st.info(f"Model Used: GMM (3 Components)")
-        
-    elif model_choice == "Hierarchical (HIRA)":
-        cluster = hira.predict(input_scaled)[0]
-        st.info(f"Model Used: Hierarchical (4 Clusters)")
+        # Mapping kembali ke nilai asli untuk logika
+        if "Kadang-kadang" in caec_input_raw: caec_input = "Sometimes"
+        elif "Sering" in caec_input_raw: caec_input = "Frequently"
+        elif "Selalu" in caec_input_raw: caec_input = "Always"
+        else: caec_input = "no"
 
-    # 6. Result Display
-    st.success(f"You belong to **Cluster {cluster}**")
-    
-    # Interpretation (Placeholder - update based on your Interpretasi.ipynb)
-    st.markdown("---")
-    st.write("**Cluster Interpretation:**")
-    if model_choice == "K-Means":
-         st.write(f"Cluster {cluster} in K-Means typically represents...")
-    elif model_choice == "Gaussian Mixture (GMM)":
-         st.write(f"Group {cluster} in GMM indicates...")
-    else:
-         st.write(f"Cluster {cluster} in Hierarchical clustering suggests...")
+    with col2:
+        # FAF (Numerik)
+        faf_val = st.slider("Seberapa sering Anda beraktivitas fisik (hari/minggu)?", 0.0, 3.0, 1.0, 0.1)
+
+        # FCVC (Numerik)
+        fcvc_val = st.slider("Seberapa sering Anda makan sayur (skala 1-3)?", 1.0, 3.0, 2.0, 0.1)
+
+        # NCP (Numerik)
+        ncp_val = st.slider("Berapa kali Anda makan besar sehari (1-4)?", 1.0, 4.0, 3.0, 1.0)
+
+    # 5. Proses Input untuk Prediksi
+    if st.button("Prediksi Cluster"):
+        
+        # --- Logika One-Hot Encoding ---
+        caec_sometimes = 1 if caec_input == "Sometimes" else 0
+        caec_no = 1 if caec_input == "no" else 0
+        caec_frequently = 1 if caec_input == "Frequently" else 0
+        
+        # --- Membuat DataFrame ---
+        input_data = pd.DataFrame({
+            "FCVC": [fcvc_val],
+            "FAF": [faf_val],
+            "FAVC": [favc_val],
+            "CAEC_Sometimes": [caec_sometimes],
+            "CAEC_no": [caec_no],
+            "CAEC_Frequently": [caec_frequently],
+            "NCP": [ncp_val],
+            "SCC_yes": [scc_val],
+            "SMOKE_yes": [smoke_val]
+        })
+
+        # Skala Input
+        input_scaled = scaler.transform(input_data)
+
+        # Prediksi
+        cluster = None
+        algo_name = ""
+
+        if "K-Means" in model_choice:
+            cluster = kmeans.predict(input_scaled)[0]
+            algo_name = "K-Means"
+        elif "Gaussian Mixture" in model_choice:
+            cluster = gmm.predict(input_scaled)[0]
+            algo_name = "GMM"
+        elif "Hierarchical" in model_choice:
+            cluster = hira.predict(input_scaled)[0]
+            algo_name = "Hierarchical (4 Cluster)"
+
+        # Menampilkan Hasil
+        st.success(f"Berdasarkan kebiasaan Anda, Anda termasuk dalam **Cluster {cluster}**")
+        st.caption(f"Model yang digunakan: {algo_name}")
+
+        # --- Logika Interpretasi ---
+        st.divider()
+        st.subheader("Apa artinya?")
+
+        # Interpretasi untuk Model 3 Cluster (K-Means, GMM)
+        if "Hierarchical" not in model_choice:
+            if cluster == 0:
+                st.info("""
+                **Cluster 0: Profil 'Sehat / Aktif'**
+                * **Kebiasaan:** Anda kemungkinan sering berolahraga dan makan sayur secara teratur.
+                * **Diet:** Anda cenderung menghindari makanan tinggi kalori yang berlebihan.
+                * **Status:** Sering dikaitkan dengan Berat Badan Normal atau individu yang bugar secara fisik.
+                """)
+            elif cluster == 1:
+                st.warning("""
+                **Cluster 1: Profil 'Moderat / Beresiko'**
+                * **Kebiasaan:** Aktivitas fisik Anda rendah hingga sedang.
+                * **Diet:** Anda mungkin mengonsumsi makanan tinggi kalori atau ngemil sesekali.
+                * **Status:** Sering dikaitkan dengan status Kelebihan Berat Badan atau kebiasaan kesehatan yang campur aduk.
+                """)
+            elif cluster == 2:
+                st.error("""
+                **Cluster 2: Profil 'Tidak Sehat'**
+                * **Kebiasaan:** Aktivitas fisik sangat rendah.
+                * **Diet:** Konsumsi tinggi makanan berkalori tinggi dan sering ngemil.
+                * **Status:** Cocok dengan karakteristik yang sering ditemukan dalam kategori Obesitas.
+                """)
+
+        # Interpretasi untuk Model 4 Cluster (Hierarchical)
+        else:
+            if cluster == 0:
+                st.info("""
+                **Cluster 0: Kelompok 'Aktif & Sehat'**
+                * **Kebiasaan:** Aktivitas fisik tinggi dan konsumsi sayur yang baik.
+                * **Status:** Kemungkinan Berat Badan Normal.
+                """)
+            elif cluster == 1:
+                st.warning("""
+                **Cluster 1: Kelompok 'Kebiasaan Moderat'**
+                * **Kebiasaan:** Aktivitas dan diet rata-rata.
+                * **Status:** Kemungkinan Kelebihan Berat Badan atau sedikit berisiko.
+                """)
+            elif cluster == 2:
+                st.error("""
+                **Cluster 2: Kelompok 'Resiko Tinggi'**
+                * **Kebiasaan:** Aktivitas rendah, asupan kalori tinggi.
+                * **Status:** Kemungkinan Obesitas (Tipe I atau II).
+                """)
+            elif cluster == 3:
+                st.error("""
+                **Cluster 3: Kelompok 'Ekstrem / Spesifik'**
+                * **Kebiasaan:** Kelompok ini sering menangkap ujung ekstrem dari spektrum (misalnya, sangat sering ngemil + nol aktivitas).
+                * **Status:** Kemungkinan Obesitas Tipe III atau pengguna dengan pola makan yang sangat spesifik.
+                """)
