@@ -26,7 +26,7 @@ if scaler is not None:
     st.sidebar.header("Pengaturan")
     model_choice = st.sidebar.selectbox(
         "Pilih Algoritma",
-        ("K-Means (3 Cluster)", "Gaussian Mixture (3 Cluster)", "Hierarchical (4 Cluster)")
+        ("K-Means", "Gaussian Mixture", "Hierarchical")
     )
 
     st.subheader("Kebiasaan Gaya Hidup Anda")
@@ -89,7 +89,7 @@ if scaler is not None:
             algo_name = "GMM"
         elif "Hierarchical" in model_choice:
             cluster = hira.predict(input_scaled)[0]
-            algo_name = "Hierarchical (4 Cluster)"
+            algo_name = "Hierarchical"
 
         st.success(f"Berdasarkan kebiasaan Anda, Anda termasuk dalam **Cluster {cluster}**")
         st.caption(f"Model yang digunakan: {algo_name}")
@@ -97,51 +97,24 @@ if scaler is not None:
         st.divider()
         st.subheader("Apa artinya?")
 
-        if "Hierarchical" not in model_choice:
-            if cluster == 0:
-                st.info("""
-                **Cluster 0: Profil 'Sehat / Aktif'**
-                * **Kebiasaan:** Anda kemungkinan sering berolahraga dan makan sayur secara teratur.
-                * **Diet:** Anda cenderung menghindari makanan tinggi kalori yang berlebihan.
-                * **Status:** Sering dikaitkan dengan Berat Badan Normal atau individu yang bugar secara fisik.
-                """)
-            elif cluster == 1:
-                st.warning("""
-                **Cluster 1: Profil 'Moderat / Beresiko'**
-                * **Kebiasaan:** Aktivitas fisik Anda rendah hingga sedang.
-                * **Diet:** Anda mungkin mengonsumsi makanan tinggi kalori atau ngemil sesekali.
-                * **Status:** Sering dikaitkan dengan status Kelebihan Berat Badan atau kebiasaan kesehatan yang campur aduk.
-                """)
-            elif cluster == 2:
-                st.error("""
-                **Cluster 2: Profil 'Tidak Sehat'**
-                * **Kebiasaan:** Aktivitas fisik sangat rendah.
-                * **Diet:** Konsumsi tinggi makanan berkalori tinggi dan sering ngemil.
-                * **Status:** Cocok dengan karakteristik yang sering ditemukan dalam kategori Obesitas.
-                """)
-
-        else:
-            if cluster == 0:
-                st.info("""
-                **Cluster 0: Kelompok 'Aktif & Sehat'**
-                * **Kebiasaan:** Aktivitas fisik tinggi dan konsumsi sayur yang baik.
-                * **Status:** Kemungkinan Berat Badan Normal.
-                """)
-            elif cluster == 1:
-                st.warning("""
-                **Cluster 1: Kelompok 'Kebiasaan Moderat'**
-                * **Kebiasaan:** Aktivitas dan diet rata-rata.
-                * **Status:** Kemungkinan Kelebihan Berat Badan atau sedikit berisiko.
-                """)
-            elif cluster == 2:
-                st.error("""
-                **Cluster 2: Kelompok 'Resiko Tinggi'**
-                * **Kebiasaan:** Aktivitas rendah, asupan kalori tinggi.
-                * **Status:** Kemungkinan Obesitas (Tipe I atau II).
-                """)
-            elif cluster == 3:
-                st.error("""
-                **Cluster 3: Kelompok 'Ekstrem / Spesifik'**
-                * **Kebiasaan:** Kelompok ini sering menangkap ujung ekstrem dari spektrum (misalnya, sangat sering ngemil + nol aktivitas).
-                * **Status:** Kemungkinan Obesitas Tipe III atau pengguna dengan pola makan yang sangat spesifik.
-                """)
+        if cluster == 0:
+            st.info("""
+            **Cluster 0: Profil 'Sehat / Aktif'**
+            * **Kebiasaan:** Anda kemungkinan sering berolahraga dan makan sayur secara teratur.
+            * **Diet:** Anda cenderung menghindari makanan tinggi kalori yang berlebihan.
+            * **Status:** Sering dikaitkan dengan Berat Badan Normal atau individu yang bugar secara fisik.
+            """)
+        elif cluster == 1:
+            st.warning("""
+            **Cluster 1: Profil 'Moderat / Beresiko'**
+            * **Kebiasaan:** Aktivitas fisik Anda rendah hingga sedang.
+            * **Diet:** Anda mungkin mengonsumsi makanan tinggi kalori atau ngemil sesekali.
+            * **Status:** Sering dikaitkan dengan status Kelebihan Berat Badan atau kebiasaan kesehatan yang campur aduk.
+            """)
+        elif cluster == 2:
+            st.error("""
+            **Cluster 2: Profil 'Tidak Sehat'**
+            * **Kebiasaan:** Aktivitas fisik sangat rendah.
+            * **Diet:** Konsumsi tinggi makanan berkalori tinggi dan sering ngemil.
+            * **Status:** Cocok dengan karakteristik yang sering ditemukan dalam kategori Obesitas.
+            """)
