@@ -42,7 +42,7 @@ gmm = GaussianMixture(n_components=3, random_state=42)
 gmm.fit(X_scaled)
 
 print("Training Hierarchical (via KNN proxy)...")
-hira = AgglomerativeClustering(n_clusters=4)
+hira = AgglomerativeClustering(n_clusters=3)
 hira_labels = hira.fit_predict(X_scaled)
 
 hira_predictor = KNeighborsClassifier(n_neighbors=5)
